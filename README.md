@@ -1,1 +1,0 @@
-The source codes of Token and Crowdsale are continuously modifying until the decision of policy.
