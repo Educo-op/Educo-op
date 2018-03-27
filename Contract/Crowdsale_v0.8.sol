@@ -14,6 +14,7 @@ contract Crowdsale{
 
 	uint private weiRaised;		// Amount of wei raised
 	uint private weiTarget;
+	uint private price;
 	uint private minEther;
 	uint private maxEther;
 
@@ -54,7 +55,7 @@ contract Crowdsale{
 	function getNumInvestor() public constant returns (uint)  { return investMember.length; }
 
 	// Constructor
-	function Crowdsale1(address _wallet, WeduToken _token, uint _totalWedu, uint _weiTarget, uint _minEther, uint _maxEther) public {
+	function Crowdsale1(address _wallet, WeduToken _token, uint _totalWedu, uint _weiTarget, uint _minEther, uint _maxEther, uint _weduPerEther) public {
 		require(_wallet != address(0));
 		require(_token != address(0));
 
@@ -64,6 +65,7 @@ contract Crowdsale{
 		weiTarget = _weiTarget;
 		minEther = _minEther;
 		maxEther = _maxEther;
+		price = (1 ehter)/_weduPerEther;
 
 		owner = msg.sender;
 	}
@@ -84,7 +86,7 @@ contract Crowdsale{
 		uint weiAmount = msg.value;
 
 		// The exchange rate are not specified
-		uint tokens = weiAmount*getRate();
+		uint tokens = weiAmount / price;
 		require(tokens+soldWedu <= totalWedu);
 
 		wallet.transfer(msg.value);
@@ -95,10 +97,6 @@ contract Crowdsale{
 		soldWedu += tokens;
 
 		TokenPurchase(msg.sender, msg.sender, msg.value, 1);
-	}
-
-	function getRate() private constant returns (uint){
-		return 1;
 	}
 
 	// Control the number of token for ICO
