@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.17;
 
 contract ERC20Interface {
 	// Returns main information
@@ -13,16 +13,16 @@ contract ERC20Interface {
 	function balanceOf(address _owner) public constant returns (uint balance);
 
 	// Transfers _value amount of tokens to address _to with Event Transfer
-	function transfer(address _to, uint _value) returns (bool success);
+	function transfer(address _to, uint _value) public returns (bool success);
 
 	// Transfers _value amount of tokens from address _from to address _to  with Event Transfer
-	function transferFrom(address _from, address _to, uint _value) returns (bool success);
+	function transferFrom(address _from, address _to, uint _value) public returns (bool success);
 
 	// Allows _spender to withdraw from your account multiple times, up to the _value amount.
-	function approve(address _spender, uint _value) returns (bool success);
+	function approve(address _spender, uint _value) public returns (bool success);
 
 	//Returns the amount which _spender is still allowed to withdraw from _owner.
-	function allowance(address _owner, address _spender) constant returns (uint remaining);
+	function allowance(address _owner, address _spender) public constant returns (uint remaining);
 
 	event Transfer(address indexed from, address indexed to, uint tokens);
 	event Approval(address indexed tokenOwner, address indexed spender, uint tokens);

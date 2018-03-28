@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.17;
 
 import './WeduToken_v0.8.sol';
 
@@ -15,8 +15,8 @@ contract Crowdsale{
 	uint private weiRaised;		// Amount of wei raised
 	uint private weiTarget;
 	uint private price;
-	uint private minEther;
-	uint private maxEther;
+	uint private LowEther;
+	uint private HighEther;
 
 	uint private start;			// Start for crowdsale
 	uint private deadline;		// Deadline for crowdsale
@@ -48,14 +48,14 @@ contract Crowdsale{
 	function getDeadline() public constant returns (uint){ return deadline; }
 
 	// Limit related parameters
-	function getMinWei() public constant returns(uint){ return 1; }
-	function getMaxWei() public constant returns(uint){ return 100; }
+	function getMinWei() public constant returns(uint){ return LowEther; }
+	function getMaxWei() public constant returns(uint){ return HighEther; }
 	function getPermission(address _user) public constant returns(bool){ return whiteList[_user]; }
 
 	function getNumInvestor() public constant returns (uint)  { return investMember.length; }
 
 	// Constructor
-	function Crowdsale1(address _wallet, WeduToken _token, uint _totalWedu, uint _weiTarget, uint _minEther, uint _maxEther, uint _weduPerEther) public {
+	function Crowdsale(address _wallet, WeduToken _token, uint _totalWedu, uint _weiTarget, uint _LowEther, uint _HighEther, uint _weduPerEther) public {
 		require(_wallet != address(0));
 		require(_token != address(0));
 
@@ -63,9 +63,9 @@ contract Crowdsale{
 		token = _token;
 		totalWedu = _totalWedu;
 		weiTarget = _weiTarget;
-		minEther = _minEther;
-		maxEther = _maxEther;
-		price = (1 ehter)/_weduPerEther;
+		LowEther = _LowEther;
+		HighEther = _HighEther;
+		price = (1 ether)/_weduPerEther;
 
 		owner = msg.sender;
 	}
@@ -80,27 +80,28 @@ contract Crowdsale{
 		address investor = msg.sender;
 		require(investor != address(0));
 		require(whiteList[investor]);
-		require(msg.value >= minEther * (1 ether));
-		require(msg.value <= maxEther * (1 ether));
+		require(msg.value >= LowEther * (1 ether));
+		require(msg.value <= HighEther * (1 ether));
 
 		uint weiAmount = msg.value;
 
 		// The exchange rate are not specified
-		uint tokens = weiAmount / price;
-		require(tokens+soldWedu <= totalWedu);
+		uint tokenRatio = weiAmount / price;
+		require(tokenRatio+soldWedu <= totalWedu);
 
 		wallet.transfer(msg.value);
-		investMember.push(membersStruct({investedDate: now, members: investor,tokenWeight:tokens }));
+		investMember.push(membersStruct({investedDate: now, members: investor,tokenWeight:tokenRatio }));
 
 		// Total collected Ethereum
 		weiRaised += weiAmount;
-		soldWedu += tokens;
+		soldWedu += tokenRatio;
 
-		TokenPurchase(msg.sender, msg.sender, msg.value, 1);
+		emit TokenPurchase(msg.sender, msg.sender, msg.value, 1);
 	}
 
 	// Control the number of token for ICO
 	function withdraForOwner(uint _amount, address _receiver) public onlyOwner {
+	    require(_receiver != address(0));
 		uint value = _amount;
 		if (_amount > getRemainToken()){
 			value = getRemainToken();
